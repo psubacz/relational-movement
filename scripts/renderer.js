@@ -35,17 +35,25 @@ export class RingRenderer {
     }
     
     drawCategoryRing(token, category, opacity = 0.5) {
+        console.log(`Relational Movement | drawCategoryRing called for ${token?.name} with category ${category?.key}`);
+        
         if (!this.containerLayer || !token || !category) {
+            console.error(`Relational Movement | Missing requirements - containerLayer: ${!!this.containerLayer}, token: ${!!token}, category: ${!!category}`);
             return null;
         }
         
         const graphics = new PIXI.Graphics();
         
         const tokenCenter = this.getTokenCenter(token);
-        if (!tokenCenter) return null;
+        if (!tokenCenter) {
+            console.error(`Relational Movement | Could not get token center for ${token.name}`);
+            return null;
+        }
         
         const radius = this.calculateRingRadius(category);
         const color = this.hexToNumber(category.color);
+        
+        console.log(`Relational Movement | Drawing ring - center: (${tokenCenter.x}, ${tokenCenter.y}), radius: ${radius}, color: ${category.color} (${color}), opacity: ${opacity}`);
         
         graphics.lineStyle(3, color, opacity);
         graphics.drawCircle(tokenCenter.x, tokenCenter.y, radius);
@@ -56,6 +64,8 @@ export class RingRenderer {
         
         this.containerLayer.addChild(graphics);
         this.renderedRings.push(graphics);
+        
+        console.log(`Relational Movement | Ring added to container layer. Total rings: ${this.renderedRings.length}`);
         
         return graphics;
     }
@@ -196,10 +206,14 @@ export class RingRenderer {
     }
     
     renderTokenRelationships(referenceToken) {
+        console.log(`Relational Movement | renderTokenRelationships called for: ${referenceToken?.name || 'null'}`);
+        
         if (!referenceToken || !this.containerLayer) {
+            console.error(`Relational Movement | Missing referenceToken (${!!referenceToken}) or containerLayer (${!!this.containerLayer})`);
             return;
         }
         
+        console.log(`Relational Movement | Clearing existing rings/lines...`);
         this.clearAllRings();
         
         const relationships = DistanceCalculator.getTokenRelationships(referenceToken);
@@ -207,18 +221,34 @@ export class RingRenderer {
         const showRings = game.settings.get(RingRenderer.MODULE_ID, 'showRings');
         const showLines = game.settings.get(RingRenderer.MODULE_ID, 'showLines');
         
+        console.log(`Relational Movement | Settings - showRings: ${showRings}, showLines: ${showLines}, opacity: ${opacity}`);
+        console.log(`Relational Movement | Found ${relationships.length} token relationships`);
+        
         this.drawSelectedIndicator(referenceToken);
         
         let renderedCount = 0;
         
-        relationships.forEach(relationship => {
+        relationships.forEach((relationship, index) => {
+            console.log(`Relational Movement | Processing relationship ${index + 1}: ${relationship.token.name} - ${relationship.category.key}`);
+            
             if (showRings) {
-                this.drawCategoryRing(relationship.token, relationship.category, opacity);
-                renderedCount++;
+                const ring = this.drawCategoryRing(relationship.token, relationship.category, opacity);
+                if (ring) {
+                    console.log(`Relational Movement | Successfully drew ring for ${relationship.token.name}`);
+                    renderedCount++;
+                } else {
+                    console.error(`Relational Movement | Failed to draw ring for ${relationship.token.name}`);
+                }
             }
+            
             if (showLines) {
-                this.drawLineBetweenTokens(referenceToken, relationship.token, relationship.category, opacity);
-                renderedCount++;
+                const line = this.drawLineBetweenTokens(referenceToken, relationship.token, relationship.category, opacity);
+                if (line) {
+                    console.log(`Relational Movement | Successfully drew line for ${relationship.token.name}`);
+                    renderedCount++;
+                } else {
+                    console.error(`Relational Movement | Failed to draw line for ${relationship.token.name}`);
+                }
             }
         });
         
@@ -229,7 +259,8 @@ export class RingRenderer {
         if (showRings) visualElements.push('rings');
         if (showLines) visualElements.push('lines');
         
-        console.log(`Relational Movement | Rendered ${visualElements.join(' and ')} for ${relationships.length} tokens: ${referenceToken.name}`);
+        console.log(`Relational Movement | Render complete - ${visualElements.join(' and ')} for ${relationships.length} tokens: ${referenceToken.name}, total rendered: ${renderedCount}`);
+        console.log(`Relational Movement | Container layer children count: ${this.containerLayer.children.length}`);
     }
     
     updateTableIfVisible(referenceToken, relationships) {
