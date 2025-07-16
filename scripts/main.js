@@ -104,7 +104,10 @@ function toggle() {
     }
     
     ui.notifications.info(`Relational Movement ${isActive ? 'enabled' : 'disabled'}`);
-    updateToolbarButton();
+    console.log(`${MODULE_TITLE} | Toggle completed, new state:`, isActive);
+    
+    // Skip toolbar button update for now to avoid errors
+    // updateToolbarButton();
 }
 
 function createToolbarButton() {
@@ -188,6 +191,21 @@ Hooks.once('init', () => {
         MODULE_ID,
         MODULE_TITLE,
         toggle,
+        simpleToggle: () => {
+            console.log(`${MODULE_TITLE} | Simple toggle called, current state:`, isActive);
+            isActive = !isActive;
+            console.log(`${MODULE_TITLE} | Module ${isActive ? 'activated' : 'deactivated'}`);
+            
+            if (!isActive) {
+                clearDisplay();
+                selectedToken = null;
+            } else if (selectedToken) {
+                updateDisplay();
+            }
+            
+            ui.notifications.info(`Relational Movement ${isActive ? 'enabled' : 'disabled'}`);
+            console.log(`${MODULE_TITLE} | Simple toggle completed, new state:`, isActive);
+        },
         isActive: () => isActive,
         selectedToken: () => selectedToken
     };
@@ -209,9 +227,9 @@ Hooks.once('ready', () => {
         renderer.initialize();
         console.log(`${MODULE_TITLE} | Renderer created successfully`);
         
-        // Create toolbar button
-        console.log(`${MODULE_TITLE} | Creating toolbar button...`);
-        createToolbarButton();
+        // Skip toolbar button for now to avoid errors
+        // console.log(`${MODULE_TITLE} | Creating toolbar button...`);
+        // createToolbarButton();
         
         // Register keybinding
         console.log(`${MODULE_TITLE} | Registering keybinding...`);
