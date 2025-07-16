@@ -1,0 +1,46 @@
+name: Release Module
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Extract version from tag
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+    
+    - name: Update version in module.json
+      run: |
+        sed -i 's/"version": ".*"/"version": "'$VERSION'"/' module.json
+    
+    - name: Create module archive
+      run: |
+        # Create both versioned and generic archives
+        zip -r relational-movement-v$VERSION.zip . \
+          -x "*.git*" \
+          -x "package.sh" \
+          -x "create-release.sh" \
+          -x "PHASE1_ROADMAP.md" \
+          -x "FORGE_INSTALLATION.md" \
+          -x ".github/*"
+        cp relational-movement-v$VERSION.zip relational-movement.zip
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          module.json
+          relational-movement-v${{ env.VERSION }}.zip
+          relational-movement.zip
+        name: Release v${{ env.VERSION }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

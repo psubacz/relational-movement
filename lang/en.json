@@ -1,0 +1,50 @@
+{
+    "relational-movement": {
+        "title": "Relational Movement",
+        "description": "A combat overlay that displays movement categories between tokens based on relative distances.",
+        
+        "settings": {
+            "enabled": {
+                "name": "Enable Relational Movement",
+                "hint": "Toggle the relational movement overlay on or off"
+            },
+            "opacity": {
+                "name": "Ring Opacity",
+                "hint": "Transparency of the distance category rings (0-100%)"
+            },
+            "maxTokens": {
+                "name": "Maximum Tokens",
+                "hint": "Maximum number of tokens to process for performance (MVP limit: 50)"
+            }
+        },
+        
+        "keybindings": {
+            "toggle": {
+                "name": "Toggle Relational Movement",
+                "hint": "Toggle the relational movement display on/off"
+            }
+        },
+        
+        "categories": {
+            "near": "Near",
+            "close": "Close", 
+            "far": "Far",
+            "distant": "Distant",
+            "remote": "Remote"
+        },
+        
+        "notifications": {
+            "enabled": "Relational Movement enabled",
+            "disabled": "Relational Movement disabled",
+            "tokenSelected": "Token selected: {name}",
+            "noTokenSelected": "No token selected",
+            "performanceLimit": "Performance limit reached: showing only {count} tokens"
+        },
+        
+        "errors": {
+            "invalidToken": "Invalid token provided",
+            "canvasNotReady": "Canvas not ready",
+            "distanceCalculationFailed": "Distance calculation failed"
+        }
+    }
+}

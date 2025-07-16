@@ -1,0 +1,75 @@
+.relational-movement-ring {
+    pointer-events: none;
+    z-index: 100;
+}
+
+.relational-movement-selected-indicator {
+    pointer-events: none;
+    z-index: 101;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+}
+
+.relational-movement-notification {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    border: 1px solid #666;
+}
+
+.relational-movement-debug {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 12px;
+    z-index: 1000;
+    max-width: 300px;
+    border: 1px solid #555;
+}
+
+.relational-movement-debug h4 {
+    margin: 0 0 5px 0;
+    color: #4CAF50;
+    font-size: 14px;
+}
+
+.relational-movement-debug .token-info {
+    margin: 5px 0;
+    padding: 3px 0;
+    border-bottom: 1px solid #333;
+}
+
+.relational-movement-debug .category-near { color: #FF0000; }
+.relational-movement-debug .category-close { color: #FF8000; }
+.relational-movement-debug .category-far { color: #FFFF00; }
+.relational-movement-debug .category-distant { color: #80FF00; }
+.relational-movement-debug .category-remote { color: #00FF00; }
+
+.relational-movement-toggle-btn {
+    background: #4CAF50;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    margin: 2px;
+}
+
+.relational-movement-toggle-btn:hover {
+    background: #45a049;
+}
+
+.relational-movement-toggle-btn.disabled {
+    background: #666;
+}
+
+.relational-movement-toggle-btn.disabled:hover {
+    background: #555;
+}
