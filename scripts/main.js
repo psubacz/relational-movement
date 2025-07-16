@@ -80,7 +80,10 @@ function onTokenUpdate(document, change, options, userId) {
             const currentSelected = canvas.tokens.controlled[0];
             if (currentSelected) {
                 selectedToken = currentSelected;
-                updateDisplay();
+                // Use setTimeout to ensure token visual positions are updated before re-rendering
+                setTimeout(() => {
+                    updateDisplay();
+                }, 50);
             } else {
                 console.log(`${MODULE_TITLE} | No currently controlled token found`);
             }
@@ -292,6 +295,20 @@ Hooks.once('init', () => {
     Hooks.on('updateToken', onTokenUpdate);
     Hooks.on('deleteToken', onTokenDelete);
     Hooks.on('canvasReady', onCanvasReady);
+    
+    // Additional hook for when token movement animation completes
+    Hooks.on('refreshToken', (token) => {
+        if (!isActive || !selectedToken) return;
+        
+        console.log(`${MODULE_TITLE} | refreshToken hook fired for ${token.name}`);
+        
+        // Update display when any token's visual representation is refreshed
+        const currentSelected = canvas.tokens.controlled[0];
+        if (currentSelected) {
+            selectedToken = currentSelected;
+            updateDisplay();
+        }
+    });
 });
 
 Hooks.once('ready', () => {
