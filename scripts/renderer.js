@@ -1,4 +1,5 @@
 import { DistanceCalculator } from './distance-calc.js';
+import { RelationshipTable } from './table-ui.js';
 
 export class RingRenderer {
     static MODULE_ID = 'relational-movement';
@@ -8,6 +9,7 @@ export class RingRenderer {
         this.renderedLines = [];
         this.selectedIndicator = null;
         this.containerLayer = null;
+        this.relationshipTable = new RelationshipTable();
     }
     
     initialize() {
@@ -169,6 +171,11 @@ export class RingRenderer {
         
         this.clearAllLines();
         this.clearSelectedIndicator();
+        
+        // Hide table when clearing display
+        if (this.relationshipTable) {
+            this.relationshipTable.hideTable();
+        }
     }
     
     clearAllLines() {
@@ -202,6 +209,7 @@ export class RingRenderer {
         const opacity = game.settings.get(RingRenderer.MODULE_ID, 'opacity') / 100;
         const showRings = game.settings.get(RingRenderer.MODULE_ID, 'showRings');
         const showLines = game.settings.get(RingRenderer.MODULE_ID, 'showLines');
+        const showTable = game.settings.get(RingRenderer.MODULE_ID, 'showTable');
         
         this.drawSelectedIndicator(referenceToken);
         
@@ -218,15 +226,29 @@ export class RingRenderer {
             }
         });
         
+        // Handle table display
+        if (showTable) {
+            this.relationshipTable.showTable(referenceToken, relationships);
+        } else {
+            this.relationshipTable.hideTable();
+        }
+        
         const visualElements = [];
         if (showRings) visualElements.push('rings');
         if (showLines) visualElements.push('lines');
+        if (showTable) visualElements.push('table');
         
         console.log(`Relational Movement | Rendered ${visualElements.join(' and ')} for ${relationships.length} tokens: ${referenceToken.name}`);
     }
     
     destroy() {
         this.clearAllRings();
+        
+        // Destroy table UI
+        if (this.relationshipTable) {
+            this.relationshipTable.destroy();
+            this.relationshipTable = null;
+        }
         
         if (this.containerLayer) {
             if (this.containerLayer.parent) {
