@@ -20,17 +20,31 @@ export class RelationalMovementSettings {
             }
         });
         
-        game.settings.register(this.MODULE_ID, 'visualMode', {
-            name: 'Visual Mode',
-            hint: 'Choose between rings around tokens or lines between tokens',
+        game.settings.register(this.MODULE_ID, 'showRings', {
+            name: 'Show Rings',
+            hint: 'Display colored rings around tokens to show distance categories',
             scope: 'client',
             config: true,
-            type: String,
-            choices: {
-                'rings': 'Rings around tokens',
-                'lines': 'Lines between tokens'
-            },
-            default: 'rings'
+            type: Boolean,
+            default: true
+        });
+        
+        game.settings.register(this.MODULE_ID, 'showLines', {
+            name: 'Show Lines',
+            hint: 'Display colored lines between selected token and other tokens',
+            scope: 'client',
+            config: true,
+            type: Boolean,
+            default: false
+        });
+        
+        game.settings.register(this.MODULE_ID, 'showTable', {
+            name: 'Show Distance Table',
+            hint: 'Display a popup table showing all token distances and categories',
+            scope: 'client',
+            config: true,
+            type: Boolean,
+            default: false
         });
         
         game.settings.register(this.MODULE_ID, 'opacity', {

@@ -200,21 +200,29 @@ export class RingRenderer {
         
         const relationships = DistanceCalculator.getTokenRelationships(referenceToken);
         const opacity = game.settings.get(RingRenderer.MODULE_ID, 'opacity') / 100;
-        const visualMode = game.settings.get(RingRenderer.MODULE_ID, 'visualMode');
+        const showRings = game.settings.get(RingRenderer.MODULE_ID, 'showRings');
+        const showLines = game.settings.get(RingRenderer.MODULE_ID, 'showLines');
         
         this.drawSelectedIndicator(referenceToken);
         
-        if (visualMode === 'lines') {
-            relationships.forEach(relationship => {
-                this.drawLineBetweenTokens(referenceToken, relationship.token, relationship.category, opacity);
-            });
-            console.log(`Relational Movement | Rendered ${relationships.length} lines for token: ${referenceToken.name}`);
-        } else {
-            relationships.forEach(relationship => {
+        let renderedCount = 0;
+        
+        relationships.forEach(relationship => {
+            if (showRings) {
                 this.drawCategoryRing(relationship.token, relationship.category, opacity);
-            });
-            console.log(`Relational Movement | Rendered ${relationships.length} rings for token: ${referenceToken.name}`);
-        }
+                renderedCount++;
+            }
+            if (showLines) {
+                this.drawLineBetweenTokens(referenceToken, relationship.token, relationship.category, opacity);
+                renderedCount++;
+            }
+        });
+        
+        const visualElements = [];
+        if (showRings) visualElements.push('rings');
+        if (showLines) visualElements.push('lines');
+        
+        console.log(`Relational Movement | Rendered ${visualElements.join(' and ')} for ${relationships.length} tokens: ${referenceToken.name}`);
     }
     
     destroy() {
