@@ -66,14 +66,27 @@ function onTokenControl(token, controlled) {
 function onTokenUpdate(document, change, options, userId) {
     console.log(`${MODULE_TITLE} | onTokenUpdate called - Active: ${isActive}, Selected: ${selectedToken?.name || 'none'}, Document: ${document.name}`);
     
-    if (!isActive || !selectedToken) {
-        console.log(`${MODULE_TITLE} | Skipping update - module inactive or no selected token`);
+    if (!isActive) {
+        console.log(`${MODULE_TITLE} | Skipping update - module inactive`);
         return;
     }
     
     if (change.x !== undefined || change.y !== undefined) {
         console.log(`${MODULE_TITLE} | Position change detected for ${document.name} - x: ${change.x}, y: ${change.y}`);
-        updateDisplay();
+        
+        // Update display if we have a selected token (any token movement affects distance calculations)
+        if (selectedToken) {
+            // Refresh selectedToken reference in case it's stale
+            const currentSelected = canvas.tokens.controlled[0];
+            if (currentSelected) {
+                selectedToken = currentSelected;
+                updateDisplay();
+            } else {
+                console.log(`${MODULE_TITLE} | No currently controlled token found`);
+            }
+        } else {
+            console.log(`${MODULE_TITLE} | No selected token to update display for`);
+        }
     } else {
         console.log(`${MODULE_TITLE} | Non-position update for ${document.name}:`, change);
     }
@@ -182,8 +195,12 @@ function updateDisplay() {
     
     if (renderer) {
         renderer.renderTokenRelationships(selectedToken);
-        // Only handle table display on initial activation, not on token selection changes
-        // Table persists independently unless explicitly controlled
+        // Handle table display - but only show/hide based on settings, don't force redraw on token selection
+        const showTable = game.settings.get('relational-movement', 'showTable');
+        if (showTable && !renderer.relationshipTable.isVisible) {
+            // Only show table if setting is on and table is not already visible
+            renderer.handleTableDisplay(selectedToken);
+        }
     } else {
         console.error(`${MODULE_TITLE} | Renderer not available in updateDisplay`);
     }
