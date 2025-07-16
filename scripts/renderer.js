@@ -172,10 +172,7 @@ export class RingRenderer {
         this.clearAllLines();
         this.clearSelectedIndicator();
         
-        // Hide table when clearing display
-        if (this.relationshipTable) {
-            this.relationshipTable.hideTable();
-        }
+        // Note: Table is NOT cleared here - it has independent lifecycle
     }
     
     clearAllLines() {
@@ -209,7 +206,6 @@ export class RingRenderer {
         const opacity = game.settings.get(RingRenderer.MODULE_ID, 'opacity') / 100;
         const showRings = game.settings.get(RingRenderer.MODULE_ID, 'showRings');
         const showLines = game.settings.get(RingRenderer.MODULE_ID, 'showLines');
-        const showTable = game.settings.get(RingRenderer.MODULE_ID, 'showTable');
         
         this.drawSelectedIndicator(referenceToken);
         
@@ -226,19 +222,38 @@ export class RingRenderer {
             }
         });
         
-        // Handle table display
+        // Update table separately if it's currently visible
+        this.updateTableIfVisible(referenceToken, relationships);
+        
+        const visualElements = [];
+        if (showRings) visualElements.push('rings');
+        if (showLines) visualElements.push('lines');
+        
+        console.log(`Relational Movement | Rendered ${visualElements.join(' and ')} for ${relationships.length} tokens: ${referenceToken.name}`);
+    }
+    
+    updateTableIfVisible(referenceToken, relationships) {
+        // Only update table if it's currently visible, don't show/hide based on setting here
+        if (this.relationshipTable && this.relationshipTable.isVisible) {
+            this.relationshipTable.updateTable(referenceToken, relationships);
+        }
+    }
+    
+    // Separate method to handle table display based on settings
+    handleTableDisplay(referenceToken) {
+        if (!referenceToken) {
+            this.relationshipTable.hideTable();
+            return;
+        }
+        
+        const showTable = game.settings.get(RingRenderer.MODULE_ID, 'showTable');
+        const relationships = DistanceCalculator.getTokenRelationships(referenceToken);
+        
         if (showTable) {
             this.relationshipTable.showTable(referenceToken, relationships);
         } else {
             this.relationshipTable.hideTable();
         }
-        
-        const visualElements = [];
-        if (showRings) visualElements.push('rings');
-        if (showLines) visualElements.push('lines');
-        if (showTable) visualElements.push('table');
-        
-        console.log(`Relational Movement | Rendered ${visualElements.join(' and ')} for ${relationships.length} tokens: ${referenceToken.name}`);
     }
     
     destroy() {

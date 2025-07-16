@@ -1,5 +1,6 @@
 import { RingRenderer } from './renderer.js';
 import { RelationalMovementSettings } from './settings.js';
+import { DistanceCalculator } from './distance-calc.js';
 
 export const MODULE_ID = 'relational-movement';
 export const MODULE_TITLE = 'Relational Movement';
@@ -172,12 +173,37 @@ function updateDisplay() {
     
     if (renderer) {
         renderer.renderTokenRelationships(selectedToken);
+        // Handle table display separately
+        renderer.handleTableDisplay(selectedToken);
     }
 }
 
 function clearDisplay() {
     if (renderer) {
         renderer.clearAllRings();
+        // Table is handled separately and will persist unless explicitly hidden
+    }
+}
+
+// New functions for independent table control
+function refreshTable() {
+    if (renderer && selectedToken && isActive) {
+        renderer.handleTableDisplay(selectedToken);
+    }
+}
+
+function hideTable() {
+    if (renderer && renderer.relationshipTable) {
+        renderer.relationshipTable.hideTable();
+    }
+}
+
+function toggleTable() {
+    if (renderer && renderer.relationshipTable) {
+        if (selectedToken && isActive) {
+            const relationships = DistanceCalculator.getTokenRelationships(selectedToken);
+            renderer.relationshipTable.toggle(selectedToken, relationships);
+        }
     }
 }
 
@@ -226,7 +252,11 @@ Hooks.once('init', () => {
             console.log(`${MODULE_TITLE} | Simple toggle completed, new state:`, isActive);
         },
         isActive: () => isActive,
-        selectedToken: () => selectedToken
+        selectedToken: () => selectedToken,
+        // Independent table controls
+        refreshTable,
+        hideTable,
+        toggleTable
     };
     
     // Register hooks
