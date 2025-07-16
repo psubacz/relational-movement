@@ -64,11 +64,18 @@ function onTokenControl(token, controlled) {
 }
 
 function onTokenUpdate(document, change, options, userId) {
-    if (!isActive || !selectedToken) return;
+    console.log(`${MODULE_TITLE} | onTokenUpdate called - Active: ${isActive}, Selected: ${selectedToken?.name || 'none'}, Document: ${document.name}`);
+    
+    if (!isActive || !selectedToken) {
+        console.log(`${MODULE_TITLE} | Skipping update - module inactive or no selected token`);
+        return;
+    }
     
     if (change.x !== undefined || change.y !== undefined) {
-        console.log(`${MODULE_TITLE} | Token moved, updating display`);
+        console.log(`${MODULE_TITLE} | Position change detected for ${document.name} - x: ${change.x}, y: ${change.y}`);
         updateDisplay();
+    } else {
+        console.log(`${MODULE_TITLE} | Non-position update for ${document.name}:`, change);
     }
 }
 
@@ -171,10 +178,14 @@ function updateDisplay() {
         return;
     }
     
+    console.log(`${MODULE_TITLE} | updateDisplay called for token: ${selectedToken.name}`);
+    
     if (renderer) {
         renderer.renderTokenRelationships(selectedToken);
-        // Handle table display separately
-        renderer.handleTableDisplay(selectedToken);
+        // Only handle table display on initial activation, not on token selection changes
+        // Table persists independently unless explicitly controlled
+    } else {
+        console.error(`${MODULE_TITLE} | Renderer not available in updateDisplay`);
     }
 }
 

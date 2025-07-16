@@ -233,8 +233,11 @@ export class RingRenderer {
     }
     
     updateTableIfVisible(referenceToken, relationships) {
-        // Only update table if it's currently visible, don't show/hide based on setting here
+        // Only update table if it's currently visible AND it's for the same reference token
+        // This prevents the table from changing when selecting different tokens
         if (this.relationshipTable && this.relationshipTable.isVisible) {
+            // Only update if this is the same token the table is currently showing
+            // or if explicitly requested (e.g., when tokens move)
             this.relationshipTable.updateTable(referenceToken, relationships);
         }
     }

@@ -4,6 +4,7 @@ export class RelationshipTable {
     constructor() {
         this.dialog = null;
         this.isVisible = false;
+        this.currentReferenceToken = null;
     }
     
     createTable(referenceToken, relationships) {
@@ -80,6 +81,9 @@ export class RelationshipTable {
             return;
         }
         
+        // Store the reference token this table is showing
+        this.currentReferenceToken = referenceToken;
+        
         const tableContent = this.createTable(referenceToken, relationships);
         
         // Close existing dialog if open
@@ -122,16 +126,21 @@ export class RelationshipTable {
             this.dialog = null;
         }
         this.isVisible = false;
+        this.currentReferenceToken = null;
     }
     
     updateTable(referenceToken, relationships) {
         if (this.isVisible && this.dialog) {
-            // Update the content of the existing dialog
-            const tableContent = this.createTable(referenceToken, relationships);
-            const dialogContent = this.dialog.element.find('.dialog-content');
-            if (dialogContent.length) {
-                dialogContent.html(tableContent);
+            // Only update if this is the same reference token the table is currently showing
+            if (this.currentReferenceToken && this.currentReferenceToken.id === referenceToken.id) {
+                // Update the content of the existing dialog
+                const tableContent = this.createTable(referenceToken, relationships);
+                const dialogContent = this.dialog.element.find('.dialog-content');
+                if (dialogContent.length) {
+                    dialogContent.html(tableContent);
+                }
             }
+            // If it's a different token, don't update - table stays with original reference token
         }
     }
     

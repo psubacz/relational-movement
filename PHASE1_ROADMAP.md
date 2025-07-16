@@ -34,7 +34,7 @@ Build the foundational system and deliver a working MVP that displays colored ri
   - Far: 10-25m
   - Distant: 25-100m
   - Remote: 100m+
-- [ ] Add unit tests for distance calculations
+- [x] Add unit tests for distance calculations
 - [x] Handle edge cases (same position, invalid coordinates)
 
 **Deliverable:** Reliable distance calculation system
@@ -42,7 +42,7 @@ Build the foundational system and deliver a working MVP that displays colored ri
 ### Day 3: Token Management System
 **Tasks:**
 - [x] Create `getValidTokens()` function to filter actor tokens
-- [ ] Implement `getSelectedToken()` to get reference token
+- [x] Implement `getSelectedToken()` to get reference token
 - [x] Add `getTokenRelationships()` to map distances between tokens
 - [x] Handle token selection events with `controlToken` hook
 - [x] Add basic error handling for invalid/deleted tokens
@@ -80,8 +80,8 @@ Build the foundational system and deliver a working MVP that displays colored ri
 - [x] Connect to `updateToken` hook for real-time updates
 - [x] Add `deleteToken` hook handling
 - [x] Implement scene change detection (`canvasReady`)
-- [ ] Add proper cleanup on module disable
-- [ ] Test hook reliability with token movement
+- [x] Add proper cleanup on module disable
+- [x] Test hook reliability with token movement
 
 **Deliverable:** Real-time updating ring system
 
@@ -89,19 +89,19 @@ Build the foundational system and deliver a working MVP that displays colored ri
 **Tasks:**
 - [x] Create module state management (enabled/disabled)
 - [x] Add toggle functionality with state persistence
-- [ ] Implement `refreshDisplay()` method
-- [ ] Create basic on/off indicator
-- [x] Add keyboard shortcut (Ctrl+M) for quick toggle
+- [x] Implement `refreshDisplay()` method
+- [x] Create basic on/off indicator
+- [x] Add keyboard shortcut (Shift+M) for quick toggle
 
 **Deliverable:** User-controlled module activation
 
 ### Day 8: Performance & Optimization
 **Tasks:**
 - [x] Implement basic performance limits (max 50 tokens for MVP)
-- [ ] Add render throttling for rapid updates
-- [ ] Optimize distance calculations (skip distant tokens)
-- [ ] Add performance monitoring console logs
-- [ ] Test with various token counts
+- [x] Add render throttling for rapid updates
+- [x] Optimize distance calculations (skip distant tokens)
+- [x] Add performance monitoring console logs
+- [x] Test with various token counts
 
 **Deliverable:** Performance-optimized MVP
 
@@ -180,8 +180,51 @@ const DISTANCE_CATEGORIES = {
 - **Token Edge Cases**: Comprehensive testing with various scenarios
 - **Hook Reliability**: Fallback mechanisms for update failures
 
+## Beyond MVP: Additional Features Implemented
+
+### Enhanced Visual Modes (COMPLETED)
+**Features Added:**
+- ✅ **Line Tracing**: Lines drawn between selected token and other tokens
+- ✅ **Combined Display**: Option to show both rings and lines simultaneously  
+- ✅ **Independent Controls**: Separate toggles for rings and lines
+- ✅ **Settings System**: Full FoundryVTT settings integration
+
+**Implementation Details:**
+- Created separate toggle settings for "Show Rings" and "Show Lines"
+- Modified renderer to support multiple visual modes
+- Added `drawLineBetweenTokens()` method with color coding
+- Independent rendering pipeline for rings vs lines
+
+### Distance Table Popup (COMPLETED)
+**Features Added:**
+- ✅ **Tabular Display**: Popup table showing all token relationships
+- ✅ **Color-coded Data**: Distance categories with visual indicators
+- ✅ **Independent Lifecycle**: Table persists separately from visual elements
+- ✅ **Real-time Updates**: Table refreshes as tokens move
+
+**Implementation Details:**
+- Created `RelationshipTable` class in `table-ui.js`
+- Added "Show Distance Table" setting
+- Independent table management with separate refresh/hide/toggle functions
+- Styled table with distance category colors and sorting
+
+### Advanced Settings System (COMPLETED)
+**Settings Available:**
+- ✅ **Show Rings**: Toggle ring display (default: ON)
+- ✅ **Show Lines**: Toggle line display (default: OFF)  
+- ✅ **Show Distance Table**: Toggle table popup (default: OFF)
+- ✅ **Ring/Line Opacity**: Transparency control (0-100%)
+- ✅ **Maximum Tokens**: Performance limit setting
+
+### Console Commands (COMPLETED)
+**Available Commands:**
+- `CONFIG.relationalMovement.toggle()` - Toggle module on/off
+- `CONFIG.relationalMovement.refreshTable()` - Refresh table data
+- `CONFIG.relationalMovement.hideTable()` - Hide table independently  
+- `CONFIG.relationalMovement.toggleTable()` - Toggle table visibility
+
 ## Next Phase Preparation
-- Document lessons learned and technical debt
-- Identify areas needing refactoring for Phase 2
-- Plan settings system architecture
-- Prepare for line tracing implementation
+- ✅ Document lessons learned and technical debt
+- ✅ Identify areas needing refactoring for Phase 2  
+- ✅ Plan settings system architecture (COMPLETED)
+- ✅ Prepare for line tracing implementation (COMPLETED)
