@@ -132,8 +132,10 @@ export class RingRenderer {
             return null;
         }
         
-        const x = token.document.x + (token.document.width * canvas.grid.size) / 2;
-        const y = token.document.y + (token.document.height * canvas.grid.size) / 2;
+        // Use token.x and token.y which are updated immediately, 
+        // rather than token.document.x/y which may be stale during updates
+        const x = token.x + (token.document.width * canvas.grid.size) / 2;
+        const y = token.y + (token.document.height * canvas.grid.size) / 2;
         
         return { x, y };
     }
