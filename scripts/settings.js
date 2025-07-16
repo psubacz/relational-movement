@@ -20,9 +20,22 @@ export class RelationalMovementSettings {
             }
         });
         
+        game.settings.register(this.MODULE_ID, 'visualMode', {
+            name: 'Visual Mode',
+            hint: 'Choose between rings around tokens or lines between tokens',
+            scope: 'client',
+            config: true,
+            type: String,
+            choices: {
+                'rings': 'Rings around tokens',
+                'lines': 'Lines between tokens'
+            },
+            default: 'rings'
+        });
+        
         game.settings.register(this.MODULE_ID, 'opacity', {
-            name: 'Ring Opacity',
-            hint: 'Transparency of the distance category rings (0-100%)',
+            name: 'Ring/Line Opacity',
+            hint: 'Transparency of the distance category rings or lines (0-100%)',
             scope: 'client',
             config: true,
             type: Number,

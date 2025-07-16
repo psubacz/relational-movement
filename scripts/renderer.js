@@ -5,6 +5,7 @@ export class RingRenderer {
     
     constructor() {
         this.renderedRings = [];
+        this.renderedLines = [];
         this.selectedIndicator = null;
         this.containerLayer = null;
     }
@@ -53,6 +54,35 @@ export class RingRenderer {
         
         this.containerLayer.addChild(graphics);
         this.renderedRings.push(graphics);
+        
+        return graphics;
+    }
+    
+    drawLineBetweenTokens(fromToken, toToken, category, opacity = 0.5) {
+        if (!this.containerLayer || !fromToken || !toToken || !category) {
+            return null;
+        }
+        
+        const graphics = new PIXI.Graphics();
+        
+        const fromCenter = this.getTokenCenter(fromToken);
+        const toCenter = this.getTokenCenter(toToken);
+        
+        if (!fromCenter || !toCenter) return null;
+        
+        const color = this.hexToNumber(category.color);
+        const lineWidth = 4;
+        
+        graphics.lineStyle(lineWidth, color, opacity);
+        graphics.moveTo(fromCenter.x, fromCenter.y);
+        graphics.lineTo(toCenter.x, toCenter.y);
+        
+        graphics.name = `line-${fromToken.id}-${toToken.id}-${category.key}`;
+        graphics.interactive = false;
+        graphics.interactiveChildren = false;
+        
+        this.containerLayer.addChild(graphics);
+        this.renderedLines.push(graphics);
         
         return graphics;
     }
@@ -137,7 +167,18 @@ export class RingRenderer {
         });
         this.renderedRings = [];
         
+        this.clearAllLines();
         this.clearSelectedIndicator();
+    }
+    
+    clearAllLines() {
+        this.renderedLines.forEach(line => {
+            if (line.parent) {
+                line.parent.removeChild(line);
+            }
+            line.destroy();
+        });
+        this.renderedLines = [];
     }
     
     clearSelectedIndicator() {
@@ -159,14 +200,21 @@ export class RingRenderer {
         
         const relationships = DistanceCalculator.getTokenRelationships(referenceToken);
         const opacity = game.settings.get(RingRenderer.MODULE_ID, 'opacity') / 100;
+        const visualMode = game.settings.get(RingRenderer.MODULE_ID, 'visualMode');
         
         this.drawSelectedIndicator(referenceToken);
         
-        relationships.forEach(relationship => {
-            this.drawCategoryRing(relationship.token, relationship.category, opacity);
-        });
-        
-        console.log(`Relational Movement | Rendered ${relationships.length} rings for token: ${referenceToken.name}`);
+        if (visualMode === 'lines') {
+            relationships.forEach(relationship => {
+                this.drawLineBetweenTokens(referenceToken, relationship.token, relationship.category, opacity);
+            });
+            console.log(`Relational Movement | Rendered ${relationships.length} lines for token: ${referenceToken.name}`);
+        } else {
+            relationships.forEach(relationship => {
+                this.drawCategoryRing(relationship.token, relationship.category, opacity);
+            });
+            console.log(`Relational Movement | Rendered ${relationships.length} rings for token: ${referenceToken.name}`);
+        }
     }
     
     destroy() {
