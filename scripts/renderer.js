@@ -7,6 +7,7 @@ export class RingRenderer {
     constructor() {
         this.renderedRings = [];
         this.renderedLines = [];
+        this.renderedLabels = [];
         this.selectedIndicator = null;
         this.containerLayer = null;
         this.relationshipTable = new RelationshipTable();
@@ -96,7 +97,67 @@ export class RingRenderer {
         this.containerLayer.addChild(graphics);
         this.renderedLines.push(graphics);
         
+        // Add distance label if enabled
+        const showLabels = game.settings.get(RingRenderer.MODULE_ID, 'showDistanceLabels');
+        if (showLabels) {
+            // Calculate the actual distance for the label
+            const distance = DistanceCalculator.calculateDistance(fromToken, toToken);
+            const label = this.drawDistanceLabel(fromToken, toToken, category, distance);
+            if (label) {
+                this.renderedLabels.push(label);
+            }
+        }
+        
         return graphics;
+    }
+    
+    drawDistanceLabel(fromToken, toToken, category, actualDistance) {
+        if (!this.containerLayer || !fromToken || !toToken) {
+            return null;
+        }
+        
+        const fromCenter = this.getTokenCenter(fromToken);
+        const toCenter = this.getTokenCenter(toToken);
+        
+        if (!fromCenter || !toCenter) return null;
+        
+        // Calculate midpoint
+        const midX = (fromCenter.x + toCenter.x) / 2;
+        const midY = (fromCenter.y + toCenter.y) / 2;
+        
+        // Get distance text based on mode
+        const distanceMode = game.settings.get(RingRenderer.MODULE_ID, 'distanceMode');
+        let labelText;
+        
+        if (distanceMode === 'abstracted') {
+            labelText = category.key;
+        } else {
+            // Use the passed actual distance
+            labelText = `${Math.round(actualDistance)}${canvas.scene.grid.units || 'u'}`;
+        }
+        
+        // Create text object
+        const textStyle = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 16,
+            fill: 0xFFFFFF,
+            stroke: 0x000000,
+            strokeThickness: 3,
+            align: 'center',
+            fontWeight: 'bold'
+        });
+        
+        const text = new PIXI.Text(labelText, textStyle);
+        text.anchor.set(0.5, 0.5);
+        text.position.set(midX, midY);
+        
+        text.name = `label-${fromToken.id}-${toToken.id}`;
+        text.interactive = false;
+        text.interactiveChildren = false;
+        
+        this.containerLayer.addChild(text);
+        
+        return text;
     }
     
     drawSelectedIndicator(token) {
@@ -182,6 +243,7 @@ export class RingRenderer {
         this.renderedRings = [];
         
         this.clearAllLines();
+        this.clearAllLabels();
         this.clearSelectedIndicator();
         
         // Note: Table is NOT cleared here - it has independent lifecycle
@@ -195,6 +257,16 @@ export class RingRenderer {
             line.destroy();
         });
         this.renderedLines = [];
+    }
+    
+    clearAllLabels() {
+        this.renderedLabels.forEach(label => {
+            if (label.parent) {
+                label.parent.removeChild(label);
+            }
+            label.destroy();
+        });
+        this.renderedLabels = [];
     }
     
     clearSelectedIndicator() {

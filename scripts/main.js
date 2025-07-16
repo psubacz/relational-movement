@@ -1,6 +1,8 @@
 import { RingRenderer } from './renderer.js';
 import { RelationalMovementSettings } from './settings.js';
 import { DistanceCalculator } from './distance-calc.js';
+import { TokenStateMatrix } from './state-matrix.js';
+import { RelationalContextMenu } from './context-menu.js';
 
 export const MODULE_ID = 'relational-movement';
 export const MODULE_TITLE = 'Relational Movement';
@@ -9,6 +11,8 @@ export const MODULE_TITLE = 'Relational Movement';
 let isActive = false;
 let selectedToken = null;
 let renderer = null;
+let stateMatrix = null;
+let contextMenu = null;
 
 console.log('Relational Movement | Script loaded');
 
@@ -75,6 +79,11 @@ function onTokenUpdate(document, change, options, userId) {
         console.log(`${MODULE_TITLE} | Position change detected for ${document.name} - x: ${change.x}, y: ${change.y}`);
         
         // Update display if we have a selected token (any token movement affects distance calculations)
+        // Update state matrix first
+        if (stateMatrix) {
+            stateMatrix.updateMatrix();
+        }
+        
         if (selectedToken) {
             // Refresh selectedToken reference in case it's stale
             const currentSelected = canvas.tokens.controlled[0];
@@ -262,6 +271,42 @@ Hooks.once('init', () => {
     });
     console.log(`${MODULE_TITLE} | Keybinding registered successfully`);
     
+    // Register advance/retreat keybindings
+    game.keybindings.register(MODULE_ID, 'advance', {
+        name: 'Advance towards targeted token',
+        hint: 'Move selected token closer to targeted token (Select token, target another, press hotkey)',
+        editable: [
+            {
+                key: 'Equal',
+                modifiers: ['Shift']
+            }
+        ],
+        onDown: () => {
+            if (window.relationalAdvance) {
+                window.relationalAdvance();
+            }
+            return true;
+        }
+    });
+    
+    game.keybindings.register(MODULE_ID, 'retreat', {
+        name: 'Retreat from targeted token',
+        hint: 'Move selected token away from targeted token (Select token, target another, press hotkey)',
+        editable: [
+            {
+                key: 'Minus',
+                modifiers: ['Shift']
+            }
+        ],
+        onDown: () => {
+            if (window.relationalRetreat) {
+                window.relationalRetreat();
+            }
+            return true;
+        }
+    });
+    console.log(`${MODULE_TITLE} | Advance/Retreat keybindings registered successfully`);
+    
     // Set up CONFIG object for other modules to access
     CONFIG.relationalMovement = {
         MODULE_ID,
@@ -284,10 +329,16 @@ Hooks.once('init', () => {
         },
         isActive: () => isActive,
         selectedToken: () => selectedToken,
+        stateMatrix: () => stateMatrix,
         // Independent table controls
         refreshTable,
         hideTable,
         toggleTable
+    };
+    
+    // Make stateMatrix globally available for context menu
+    window.relationalMovement = {
+        stateMatrix: stateMatrix
     };
     
     // Register hooks
@@ -301,6 +352,11 @@ Hooks.once('init', () => {
         if (!isActive || !selectedToken) return;
         
         console.log(`${MODULE_TITLE} | refreshToken hook fired for ${token.name}`);
+        
+        // Update state matrix
+        if (stateMatrix) {
+            stateMatrix.updateMatrix();
+        }
         
         // Update display when any token's visual representation is refreshed
         const currentSelected = canvas.tokens.controlled[0];
@@ -320,6 +376,16 @@ Hooks.once('ready', () => {
         renderer = new RingRenderer();
         renderer.initialize();
         console.log(`${MODULE_TITLE} | Renderer created successfully`);
+        
+        // Initialize state matrix
+        console.log(`${MODULE_TITLE} | Creating state matrix...`);
+        stateMatrix = new TokenStateMatrix();
+        console.log(`${MODULE_TITLE} | State matrix created successfully`);
+        
+        // Initialize context menu
+        console.log(`${MODULE_TITLE} | Creating context menu...`);
+        contextMenu = new RelationalContextMenu(stateMatrix);
+        console.log(`${MODULE_TITLE} | Context menu created successfully`);
         
         // Skip toolbar button for now to avoid errors
         // console.log(`${MODULE_TITLE} | Creating toolbar button...`);

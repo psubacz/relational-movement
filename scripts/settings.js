@@ -74,6 +74,37 @@ export class RelationalMovementSettings {
             },
             default: 50
         });
+        
+        game.settings.register(this.MODULE_ID, 'distanceMode', {
+            name: 'Distance Mode',
+            hint: 'Choose between abstracted distance categories or actual in-game measurements',
+            scope: 'world',
+            config: true,
+            type: String,
+            choices: {
+                'abstracted': 'Abstracted (Near/Close/Far/Distant/Remote)',
+                'precise': 'Precise (Show actual game distances)'
+            },
+            default: 'abstracted'
+        });
+        
+        game.settings.register(this.MODULE_ID, 'showDistanceLabels', {
+            name: 'Show Distance Labels',
+            hint: 'Display distance labels on the center of lines between tokens',
+            scope: 'client',
+            config: true,
+            type: Boolean,
+            default: true
+        });
+        
+        game.settings.register(this.MODULE_ID, 'showStateNotifications', {
+            name: 'Show State Change Notifications',
+            hint: 'Display notifications when tokens move between distance categories',
+            scope: 'client',
+            config: true,
+            type: Boolean,
+            default: false
+        });
     }
     
     static getSetting(key) {
