@@ -186,6 +186,25 @@ Hooks.once('init', () => {
     console.log(`${MODULE_TITLE} | Initializing module`);
     RelationalMovementSettings.registerSettings();
     
+    // Register keybinding during init hook (required by FoundryVTT)
+    console.log(`${MODULE_TITLE} | Registering keybinding...`);
+    game.keybindings.register(MODULE_ID, 'toggle', {
+        name: 'Toggle Relational Movement',
+        hint: 'Toggle the relational movement display on/off',
+        editable: [
+            {
+                key: 'KeyM',
+                modifiers: ['Shift']
+            }
+        ],
+        onDown: () => {
+            console.log('Relational Movement | Keybinding triggered');
+            toggle();
+            return true;
+        }
+    });
+    console.log(`${MODULE_TITLE} | Keybinding registered successfully`);
+    
     // Set up CONFIG object for other modules to access
     CONFIG.relationalMovement = {
         MODULE_ID,
@@ -230,25 +249,6 @@ Hooks.once('ready', () => {
         // Skip toolbar button for now to avoid errors
         // console.log(`${MODULE_TITLE} | Creating toolbar button...`);
         // createToolbarButton();
-        
-        // Register keybinding
-        console.log(`${MODULE_TITLE} | Registering keybinding...`);
-        game.keybindings.register(MODULE_ID, 'toggle', {
-            name: 'Toggle Relational Movement',
-            hint: 'Toggle the relational movement display on/off',
-            editable: [
-                {
-                    key: 'KeyM',
-                    modifiers: ['Shift']
-                }
-            ],
-            onDown: () => {
-                console.log('Relational Movement | Keybinding triggered');
-                toggle();
-                return true;
-            }
-        });
-        console.log(`${MODULE_TITLE} | Keybinding registered successfully`);
         
         // Global debugging functions
         console.log(`${MODULE_TITLE} | Creating global functions...`);
